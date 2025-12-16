@@ -17,11 +17,11 @@ $isRailway = isset($_ENV['RAILWAY_ENVIRONMENT']) || isset($_ENV['PORT']);
 try {
     if ($isRailway) {
         // ===== RAILWAY =====
-        $DB_HOST = $_ENV['MYSQLHOST'];
+        $DB_HOST = $_ENV['mysql.railway.internal'];
         $DB_PORT = $_ENV['MYSQLPORT'];
-        $DB_NAME = $_ENV['MYSQLDATABASE'];
-        $DB_USER = $_ENV['MYSQLUSER'];
-        $DB_PASS = $_ENV['MYSQLPASSWORD'];
+        $DB_NAME = $_ENV['railway'];
+        $DB_USER = $_ENV['3306'];
+        $DB_PASS = $_ENV['sTPQRWBVkjFBIUsCvcXSgNfICFgLWDTt'];
 
         $dsn = "mysql:host={$DB_HOST};port={$DB_PORT};dbname={$DB_NAME};charset=utf8mb4";
     } else {
