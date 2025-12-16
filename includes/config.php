@@ -1,25 +1,73 @@
 <?php
 require_once __DIR__ . "/helpers.php";
 
-// Koneksi database (PDO)
-$DB_HOST = '127.0.0.1';
-$DB_NAME = 'tierlist_db';
-$DB_USER = 'root';
-$DB_PASS = '';
+/**
+ * =========================
+ * DETEKSI ENVIRONMENT
+ * =========================
+ * Railway otomatis menyediakan variable PORT
+ */
+$isRailway = isset($_ENV['RAILWAY_ENVIRONMENT']) || isset($_ENV['PORT']);
 
-$options = [
-    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-];
-
+/**
+ * =========================
+ * KONFIGURASI DATABASE
+ * =========================
+ */
 try {
-    $pdo = new PDO("mysql:host={$DB_HOST};dbname={$DB_NAME};charset=utf8mb4", $DB_USER, $DB_PASS, $options);
+    if ($isRailway) {
+        // ===== RAILWAY =====
+        $DB_HOST = $_ENV['MYSQLHOST'];
+        $DB_PORT = $_ENV['MYSQLPORT'];
+        $DB_NAME = $_ENV['MYSQLDATABASE'];
+        $DB_USER = $_ENV['MYSQLUSER'];
+        $DB_PASS = $_ENV['MYSQLPASSWORD'];
+
+        $dsn = "mysql:host={$DB_HOST};port={$DB_PORT};dbname={$DB_NAME};charset=utf8mb4";
+    } else {
+        // ===== LOCALHOST =====
+        $DB_HOST = '127.0.0.1';
+        $DB_NAME = 'tierlist_db';
+        $DB_USER = 'root';
+        $DB_PASS = '';
+
+        $dsn = "mysql:host={$DB_HOST};dbname={$DB_NAME};charset=utf8mb4";
+    }
+
+    $options = [
+        PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+    ];
+
+    $pdo = new PDO($dsn, $DB_USER, $DB_PASS, $options);
+
 } catch (PDOException $e) {
     die("Database connection failed: " . $e->getMessage());
 }
 
-// BASE_URL
-define('BASE_URL', 'http://localhost/tierlist_project/public/');
+/**
+ * =========================
+ * BASE URL
+ * =========================
+ */
+if ($isRailway) {
+    define('BASE_URL', '/'); 
+} else {
+    define('BASE_URL', 'http://localhost/tierlist_project/public/');
+}
 
-// Path filesystem root berfungsi untuk menyimpan file
+/**
+ * =========================
+ * PATH ROOT PROJECT
+ * =========================
+ */
 define('PROJECT_ROOT', realpath(__DIR__ . '/../') . '/');
+
+/**
+ * =========================
+ * SESSION
+ * =========================
+ */
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
